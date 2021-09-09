@@ -45,15 +45,17 @@ class PriceTracker(models.Model):
         grid = soup.find('div', class_='desktop-grid')
 
         results = {}
+        brands = set()
         for elem in grid.find_all('a', class_='car-result-card'):
             brand, category, price = elem['data-brand'], elem['data-category-name'], elem['data-price']
+            brands.add(brand)
             price = round(float(price), 2)
             if category not in results:
-                results[category] = dict(options=[], lowestPrice=100000.00)
+                results[category] = dict(prices=[], lowestPrice=100000.00)
             results[category]['lowestPrice'] = min(results[category]['lowestPrice'], price)
-            results[category]['options'].append(dict(brand=brand, price=price))
-
-        return results
+            results[category]['prices'].append(dict(brand=brand, price=price))
+            
+        return dict(brands=sorted(brands), options=results)
 
 
 
